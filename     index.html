@@ -1,0 +1,897 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Uhr lernen – 24-Stunden-System</title>
+
+<style>
+html, body {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f4f7fb;
+  margin: 0;
+  padding: 20px;
+  color: #1f2937;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.container {
+  max-width: 980px;
+  margin: auto;
+  background: white;
+  border-radius: 22px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
+h1, h2 {
+  text-align: center;
+  color: #0f172a;
+}
+
+h1 { margin-top: 0; }
+
+h2 {
+  margin-top: 34px;
+  border-top: 2px solid #e2e8f0;
+  padding-top: 24px;
+}
+
+.top {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.clock-wrap {
+  width: 320px;
+  height: 320px;
+}
+
+.clock {
+  width: 300px;
+  height: 300px;
+  border: 10px solid #111827;
+  border-radius: 50%;
+  background: white;
+  position: relative;
+  margin: auto;
+  touch-action: manipulation;
+}
+
+.tick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center center;
+  pointer-events: none;
+}
+
+.tick::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  top: -141px;
+  width: 2px;
+  height: 8px;
+  background: #94a3b8;
+  border-radius: 2px;
+}
+
+.tick.major::after {
+  left: -2px;
+  top: -145px;
+  width: 4px;
+  height: 15px;
+  background: #111827;
+}
+
+.num {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  text-align: center;
+  line-height: 34px;
+  font-weight: 800;
+  font-size: 20px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.num24 {
+  position: absolute;
+  width: 34px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #2563eb;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hand {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  transform-origin: bottom center;
+  border-radius: 10px;
+  background: #111827;
+  z-index: 5;
+}
+
+.hour {
+  width: 9px;
+  height: 80px;
+  margin-left: -4.5px;
+}
+
+.minute {
+  width: 5px;
+  height: 116px;
+  margin-left: -2.5px;
+}
+
+.center {
+  width: 18px;
+  height: 18px;
+  background: #111827;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  pointer-events: none;
+}
+
+.panel {
+  flex: 1;
+  min-width: 285px;
+  background: #f8fafc;
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.mode-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+select, button {
+  font-size: 18px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  margin: 5px 0;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+button.secondary { background: #475569; }
+button.good { background: #16a34a; }
+button.orange { background: #ea580c; }
+button.dark { background: #111827; }
+
+.daynight {
+  display: inline-block;
+  background: #e0f2fe;
+  color: #075985;
+  font-weight: 800;
+  padding: 8px 12px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.question {
+  font-size: 24px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  color: #0f172a;
+}
+
+.time-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 10px;
+}
+
+.time-box {
+  width: 66px;
+  height: 54px;
+  border-radius: 12px;
+  border: 2px solid #cbd5e1;
+  background: white;
+  text-align: center;
+  line-height: 54px;
+  font-size: 30px;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: 2px;
+}
+
+.time-box.active {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.18);
+}
+
+.colon-fixed {
+  font-size: 36px;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 285px;
+  margin-top: 12px;
+}
+
+.keypad button {
+  font-size: 24px;
+  padding: 14px 0;
+  border-radius: 14px;
+  background: #0f172a;
+}
+
+.keypad button.action {
+  font-size: 18px;
+  background: #475569;
+}
+
+.keypad button.good {
+  background: #16a34a;
+  font-size: 20px;
+}
+
+.arrow-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.arrow-buttons button {
+  min-height: 68px;
+  font-size: 21px;
+  border-radius: 16px;
+}
+
+.feedback {
+  font-size: 20px;
+  font-weight: 800;
+  margin-top: 14px;
+  min-height: 32px;
+}
+
+.ok { color: #16a34a; }
+.bad { color: #dc2626; }
+
+.score {
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.controls {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 8px;
+}
+
+.explain {
+  margin-top: 16px;
+  background: #eef6ff;
+  border-left: 5px solid #2563eb;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.small {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.trainer-time, .digital-task {
+  font-size: 38px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 8px 0 2px;
+  letter-spacing: 1px;
+}
+
+.trainer-sub {
+  font-size: 20px;
+  font-weight: 800;
+  color: #2563eb;
+  margin-bottom: 12px;
+}
+
+.slider-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 58px;
+  gap: 10px;
+  align-items: center;
+  margin: 10px 0;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+@media(max-width:600px) {
+  body { padding: 12px; }
+  .container { padding: 16px; }
+  .clock-wrap { width: 280px; height: 280px; }
+  .clock { width: 260px; height: 260px; }
+  .tick::after { top: -122px; height: 7px; }
+  .tick.major::after { top: -126px; height: 13px; }
+  .hour { height: 68px; }
+  .minute { height: 98px; }
+  .question { font-size: 21px; }
+  .controls { grid-template-columns: 1fr; }
+  .arrow-buttons { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .arrow-buttons button { min-height: 64px; font-size: 19px; }
+  .slider-row { grid-template-columns: 75px 1fr 50px; }
+  .keypad { max-width: 100%; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h1>Uhr lernen – 24-Stunden-System</h1>
+
+  <h2>1. Aufgaben: Uhr ablesen</h2>
+  <div class="top">
+    <div class="clock-wrap">
+      <div class="clock" id="quizClock">
+        <div class="hand hour" id="quizHourHand"></div>
+        <div class="hand minute" id="quizMinuteHand"></div>
+        <div class="center"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="mode-row">
+        <label for="level"><b>Schwierigkeitsgrad:</b></label>
+        <select id="level" onchange="newQuestion(); newSetTask();">
+          <option value="easy">Einfach: volle Stunden</option>
+          <option value="half">Halbe Stunden</option>
+          <option value="quarter">Viertelstunden</option>
+          <option value="five" selected>5-Minuten-Schritte</option>
+          <option value="all">Gemischt</option>
+        </select>
+      </div>
+
+      <div class="daynight" id="quizDayNight">Zeit: Tag</div>
+      <div class="question" id="question">Welche Uhrzeit zeigt die Uhr?</div>
+
+      <div class="time-input">
+        <div class="time-box active" id="hourBox" onclick="setActivePart('hour')">__</div>
+        <div class="colon-fixed">:</div>
+        <div class="time-box" id="minuteBox" onclick="setActivePart('minute')">__</div>
+        <button onclick="checkAnswer()">Prüfen</button>
+      </div>
+
+      <div class="keypad">
+        <button onclick="addDigit('1')">1</button>
+        <button onclick="addDigit('2')">2</button>
+        <button onclick="addDigit('3')">3</button>
+        <button onclick="addDigit('4')">4</button>
+        <button onclick="addDigit('5')">5</button>
+        <button onclick="addDigit('6')">6</button>
+        <button onclick="addDigit('7')">7</button>
+        <button onclick="addDigit('8')">8</button>
+        <button onclick="addDigit('9')">9</button>
+        <button class="action" onclick="backspaceDigit()">⌫</button>
+        <button onclick="addDigit('0')">0</button>
+        <button class="good" onclick="checkAnswer()">OK</button>
+        <button class="action" onclick="clearAnswer()">Löschen</button>
+        <button class="action" onclick="setActivePart('hour')">Stunde</button>
+        <button class="action" onclick="setActivePart('minute')">Minute</button>
+      </div>
+
+      <div class="small">Die Doppelpunkte bleiben fest. Nur Stunden und Minuten eingeben.</div>
+
+      <div class="feedback" id="feedback"></div>
+      <div class="score" id="score">Richtig: 0 | Versuche: 0</div>
+
+      <div class="controls">
+        <button class="secondary" onclick="showSolution()">Lösung zeigen</button>
+        <button class="good" onclick="newQuestion()">Neue Aufgabe</button>
+        <button class="secondary" onclick="practiceNowQuiz()">Aktuelle Uhrzeit üben</button>
+        <button class="secondary" onclick="resetScore()">Punkte zurücksetzen</button>
+      </div>
+
+      <div class="explain" id="explain">
+        Tipp: Die kleinen Striche sind Minuten. Jeder große Strich steht für 5 Minuten.
+      </div>
+    </div>
+  </div>
+
+  <h2>2. Aufgaben: Zeiger einstellen</h2>
+  <div class="top">
+    <div class="clock-wrap">
+      <div class="clock" id="setClock">
+        <div class="hand hour" id="setHourHand"></div>
+        <div class="hand minute" id="setMinuteHand"></div>
+        <div class="center"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="daynight" id="setDayNight">Zeit: Tag</div>
+      <div class="question">Stelle die Zeiger auf diese Uhrzeit:</div>
+      <div class="digital-task" id="digitalTask">14:35</div>
+
+      <div class="arrow-buttons">
+        <button data-action="setHourMinus">← Stunde</button>
+        <button data-action="setHourPlus">Stunde →</button>
+        <button data-action="setMinMinus5">← 5 Min</button>
+        <button data-action="setMinPlus5">5 Min →</button>
+        <button data-action="setMinMinus1">← 1 Min</button>
+        <button data-action="setMinPlus1">1 Min →</button>
+        <button class="good" onclick="checkSetClock()">Prüfen</button>
+        <button onclick="newSetTask()">Neue Aufgabe</button>
+        <button class="secondary" onclick="showSetSolution()">Lösung zeigen</button>
+        <button class="orange" onclick="roundSetToFive()">Auf 5 Min. runden</button>
+      </div>
+
+      <div class="feedback" id="setFeedback"></div>
+      <div class="explain">
+        Gedrückt halten funktioniert auch. Beide Zeiger sind schwarz wie bei einer echten Uhr.
+      </div>
+    </div>
+  </div>
+
+  <h2>3. Freies Training</h2>
+  <div class="top">
+    <div class="clock-wrap">
+      <div class="clock" id="trainClock">
+        <div class="hand hour" id="trainHourHand"></div>
+        <div class="hand minute" id="trainMinuteHand"></div>
+        <div class="center"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="trainer-time" id="trainerTime">13:30</div>
+      <div class="trainer-sub" id="trainerDayNight">Nachmittag / Tag</div>
+
+      <div class="small">
+        Hier kannst du frei üben. Die Regler ändern die Uhrzeit direkt.
+      </div>
+
+      <div class="slider-row">
+        <b>Stunde</b>
+        <input type="range" id="hourSlider" min="0" max="23" value="13" oninput="setTrainingFromSliders()">
+        <span id="hourLabel">13</span>
+      </div>
+
+      <div class="slider-row">
+        <b>Minute</b>
+        <input type="range" id="minuteSlider" min="0" max="59" step="1" value="30" oninput="setTrainingFromSliders()">
+        <span id="minuteLabel">30</span>
+      </div>
+
+      <div class="controls">
+        <button onclick="setTrainingTime(7,0)">07:00</button>
+        <button onclick="setTrainingTime(12,0)">12:00</button>
+        <button onclick="setTrainingTime(18,30)">18:30</button>
+        <button onclick="setTrainingTime(22,15)">22:15</button>
+        <button class="orange" onclick="roundTrainingToFive()">Auf 5 Min. runden</button>
+        <button class="secondary" onclick="practiceNowTraining()">Jetzt</button>
+      </div>
+
+      <div class="explain">
+        Lernidee: Erst Minuten lesen, dann Stunde bestimmen, dann Tag/Nacht prüfen.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentHour = 0;
+let currentMinute = 0;
+let attempts = 0;
+let correct = 0;
+
+let activePart = "hour";
+let inputHour = "";
+let inputMinute = "";
+
+let setHour = 0;
+let setMinute = 0;
+let targetHour = 14;
+let targetMinute = 35;
+
+let trainHour = 13;
+let trainMinute = 30;
+
+function pad(n) {
+  return String(n).padStart(2, "0");
+}
+
+function timeText(h, m) {
+  return pad(h) + ":" + pad(m);
+}
+
+function periodText(h) {
+  if (h >= 5 && h < 12) return "Morgen / Tag";
+  if (h >= 12 && h < 18) return "Nachmittag / Tag";
+  if (h >= 18 && h < 22) return "Abend / Tag";
+  return "Nacht";
+}
+
+function setActivePart(part) {
+  activePart = part;
+  document.getElementById("hourBox").classList.toggle("active", part === "hour");
+  document.getElementById("minuteBox").classList.toggle("active", part === "minute");
+}
+
+function updateInputBoxes() {
+  document.getElementById("hourBox").textContent = inputHour.padEnd(2, "_");
+  document.getElementById("minuteBox").textContent = inputMinute.padEnd(2, "_");
+}
+
+function addDigit(d) {
+  if (activePart === "hour") {
+    if (inputHour.length < 2) inputHour += d;
+    if (inputHour.length === 2) setActivePart("minute");
+  } else {
+    if (inputMinute.length < 2) inputMinute += d;
+  }
+  updateInputBoxes();
+}
+
+function backspaceDigit() {
+  if (activePart === "minute") {
+    if (inputMinute.length > 0) inputMinute = inputMinute.slice(0, -1);
+    else setActivePart("hour");
+  } else {
+    inputHour = inputHour.slice(0, -1);
+  }
+  updateInputBoxes();
+}
+
+function clearAnswer() {
+  inputHour = "";
+  inputMinute = "";
+  setActivePart("hour");
+  updateInputBoxes();
+  document.getElementById("feedback").textContent = "";
+}
+
+function answerText() {
+  if (inputHour.length === 0 || inputMinute.length === 0) return null;
+  const h = Number(inputHour);
+  const m = Number(inputMinute);
+  if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+  return timeText(h, m);
+}
+
+function drawClockMarks(clockId) {
+  const clock = document.getElementById(clockId);
+
+  for (let i = 0; i < 60; i++) {
+    const tick = document.createElement("div");
+    tick.className = "tick" + (i % 5 === 0 ? " major" : "");
+    tick.style.transform = `rotate(${i * 6}deg)`;
+    clock.appendChild(tick);
+  }
+}
+
+function drawNumbers(clockId) {
+  const clock = document.getElementById(clockId);
+  const size = clock.clientWidth;
+  const center = size / 2;
+  const r1 = size * 0.41;
+  const r2 = size * 0.33;
+
+  for (let i = 1; i <= 12; i++) {
+    const angle = (i * 30 - 90) * Math.PI / 180;
+
+    const n = document.createElement("div");
+    n.className = "num";
+    n.style.left = (center + r1 * Math.cos(angle)) + "px";
+    n.style.top = (center + r1 * Math.sin(angle)) + "px";
+    n.textContent = i;
+    clock.appendChild(n);
+
+    const n24 = document.createElement("div");
+    n24.className = "num24";
+    n24.style.left = (center + r2 * Math.cos(angle)) + "px";
+    n24.style.top = (center + r2 * Math.sin(angle)) + "px";
+    n24.textContent = pad(i === 12 ? 0 : i + 12);
+    clock.appendChild(n24);
+  }
+}
+
+function setupClockFace(clockId) {
+  drawClockMarks(clockId);
+  drawNumbers(clockId);
+}
+
+function setClockHands(prefix, h, m) {
+  const hourDeg = ((h % 12) * 30) + (m * 0.5);
+  const minuteDeg = m * 6;
+
+  document.getElementById(prefix + "HourHand").style.transform = `rotate(${hourDeg}deg)`;
+  document.getElementById(prefix + "MinuteHand").style.transform = `rotate(${minuteDeg}deg)`;
+}
+
+function randomMinute(level) {
+  if (level === "easy") return 0;
+  if (level === "half") return Math.random() < 0.5 ? 0 : 30;
+  if (level === "quarter") return [0,15,30,45][Math.floor(Math.random()*4)];
+  if (level === "five") return Math.floor(Math.random()*12)*5;
+  return Math.floor(Math.random()*60);
+}
+
+function newQuestion() {
+  const level = document.getElementById("level").value;
+  currentHour = Math.floor(Math.random() * 24);
+  currentMinute = randomMinute(level);
+
+  setClockHands("quiz", currentHour, currentMinute);
+  document.getElementById("quizDayNight").textContent = "Zeit: " + periodText(currentHour);
+  document.getElementById("question").textContent = "Welche Uhrzeit zeigt die Uhr?";
+  clearAnswer();
+
+  document.getElementById("explain").innerHTML =
+    "Tipp: Die kleinen Striche sind Minuten. Jeder große Strich steht für 5 Minuten.";
+}
+
+function checkAnswer() {
+  const ans = answerText();
+  const solution = timeText(currentHour, currentMinute);
+  attempts++;
+
+  if (ans === solution) {
+    correct++;
+    document.getElementById("feedback").textContent = "Richtig! Sehr gut.";
+    document.getElementById("feedback").className = "feedback ok";
+  } else if (ans === null) {
+    document.getElementById("feedback").textContent = "Bitte gültige Stunde und Minute eingeben.";
+    document.getElementById("feedback").className = "feedback bad";
+  } else {
+    document.getElementById("feedback").textContent = "Noch nicht richtig. Versuch es nochmal.";
+    document.getElementById("feedback").className = "feedback bad";
+  }
+
+  updateScore();
+}
+
+function showSolution() {
+  document.getElementById("feedback").textContent = "Lösung: " + timeText(currentHour, currentMinute);
+  document.getElementById("feedback").className = "feedback ok";
+}
+
+function practiceNowQuiz() {
+  const now = new Date();
+  currentHour = now.getHours();
+  currentMinute = now.getMinutes();
+
+  setClockHands("quiz", currentHour, currentMinute);
+  document.getElementById("quizDayNight").textContent = "Zeit: " + periodText(currentHour);
+  document.getElementById("question").textContent = "Wie spät ist es jetzt?";
+  clearAnswer();
+}
+
+function updateScore() {
+  document.getElementById("score").textContent = "Richtig: " + correct + " | Versuche: " + attempts;
+}
+
+function resetScore() {
+  attempts = 0;
+  correct = 0;
+  updateScore();
+  document.getElementById("feedback").textContent = "";
+}
+
+function setSetClockTime(h, m) {
+  setHour = (h + 24) % 24;
+  setMinute = m;
+
+  while (setMinute < 0) {
+    setMinute += 60;
+    setHour = (setHour - 1 + 24) % 24;
+  }
+
+  while (setMinute >= 60) {
+    setMinute -= 60;
+    setHour = (setHour + 1) % 24;
+  }
+
+  setClockHands("set", setHour, setMinute);
+}
+
+function changeSetHour(delta) {
+  setSetClockTime(setHour + delta, setMinute);
+}
+
+function changeSetMinute(delta) {
+  setSetClockTime(setHour, setMinute + delta);
+}
+
+function newSetTask() {
+  const level = document.getElementById("level").value;
+
+  targetHour = Math.floor(Math.random() * 24);
+  targetMinute = randomMinute(level);
+
+  document.getElementById("digitalTask").textContent = timeText(targetHour, targetMinute);
+  document.getElementById("setDayNight").textContent = "Zeit: " + periodText(targetHour);
+  document.getElementById("setFeedback").textContent = "";
+
+  setSetClockTime(0, 0);
+}
+
+function checkSetClock() {
+  const fb = document.getElementById("setFeedback");
+
+  if (setHour === targetHour && setMinute === targetMinute) {
+    fb.textContent = "Richtig! Die Zeiger passen.";
+    fb.className = "feedback ok";
+  } else {
+    fb.textContent = "Noch nicht richtig. Ziel: " + timeText(targetHour, targetMinute) + " | Deine Uhr: " + timeText(setHour, setMinute);
+    fb.className = "feedback bad";
+  }
+}
+
+function showSetSolution() {
+  setSetClockTime(targetHour, targetMinute);
+  document.getElementById("setFeedback").textContent = "Lösung eingestellt: " + timeText(targetHour, targetMinute);
+  document.getElementById("setFeedback").className = "feedback ok";
+}
+
+function roundSetToFive() {
+  let m = Math.round(setMinute / 5) * 5;
+  let h = setHour;
+
+  if (m === 60) {
+    m = 0;
+    h = (h + 1) % 24;
+  }
+
+  setSetClockTime(h, m);
+}
+
+function setTrainingTime(h, m) {
+  trainHour = h;
+  trainMinute = m;
+  setClockHands("train", trainHour, trainMinute);
+
+  document.getElementById("hourSlider").value = trainHour;
+  document.getElementById("minuteSlider").value = trainMinute;
+
+  updateTrainingLabels();
+}
+
+function setTrainingFromSliders() {
+  setTrainingTime(
+    Number(document.getElementById("hourSlider").value),
+    Number(document.getElementById("minuteSlider").value)
+  );
+}
+
+function updateTrainingLabels() {
+  document.getElementById("trainerTime").textContent = timeText(trainHour, trainMinute);
+  document.getElementById("trainerDayNight").textContent = periodText(trainHour);
+  document.getElementById("hourLabel").textContent = pad(trainHour);
+  document.getElementById("minuteLabel").textContent = pad(trainMinute);
+}
+
+function practiceNowTraining() {
+  const now = new Date();
+  setTrainingTime(now.getHours(), now.getMinutes());
+}
+
+function roundTrainingToFive() {
+  let m = Math.round(trainMinute / 5) * 5;
+  let h = trainHour;
+
+  if (m === 60) {
+    m = 0;
+    h = (h + 1) % 24;
+  }
+
+  setTrainingTime(h, m);
+}
+
+function performAction(action) {
+  switch(action) {
+    case "setHourMinus": changeSetHour(-1); break;
+    case "setHourPlus": changeSetHour(1); break;
+    case "setMinMinus5": changeSetMinute(-5); break;
+    case "setMinPlus5": changeSetMinute(5); break;
+    case "setMinMinus1": changeSetMinute(-1); break;
+    case "setMinPlus1": changeSetMinute(1); break;
+  }
+}
+
+function enableHold(button) {
+  let interval = null;
+  let timeout = null;
+  const action = button.dataset.action;
+
+  function start(e) {
+    e.preventDefault();
+    performAction(action);
+
+    timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        performAction(action);
+      }, 120);
+    }, 350);
+  }
+
+  function stop() {
+    clearTimeout(timeout);
+    clearInterval(interval);
+  }
+
+  button.addEventListener("pointerdown", start);
+  button.addEventListener("pointerup", stop);
+  button.addEventListener("pointerleave", stop);
+  button.addEventListener("pointercancel", stop);
+}
+
+document.addEventListener("dblclick", function(e) {
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") checkAnswer();
+  if (/^[0-9]$/.test(e.key)) addDigit(e.key);
+  if (e.key === "Backspace") backspaceDigit();
+  if (e.key === "Escape") clearAnswer();
+});
+
+setupClockFace("quizClock");
+setupClockFace("setClock");
+setupClockFace("trainClock");
+
+document.querySelectorAll("[data-action]").forEach(enableHold);
+
+newQuestion();
+newSetTask();
+setTrainingTime(13, 30);
+</script>
+</body>
+</html>
